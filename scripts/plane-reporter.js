@@ -141,7 +141,7 @@ async function uploadAttachment(workItemId, filePath) {
         }
       );
 
-      return meta.asset_url || null;
+      return toAbsoluteUrl(meta.asset_url) || null;
     } catch (e) {
       console.warn(`    ⚠ Upload error for ${filename}: ${e.message}`);
       return null;
@@ -149,10 +149,14 @@ async function uploadAttachment(workItemId, filePath) {
   }
 
   // Fallback: some self-hosted versions return asset_url directly
-  return meta?.asset_url || null;
+  return toAbsoluteUrl(meta?.asset_url) || null;
 }
 
-// Find work item by sequence ID
+// Prefix relative URLs with PLANE_BASE
+function toAbsoluteUrl(url) {
+  if (!url) return null;
+  return url.startsWith('http') ? url : `${PLANE_BASE}${url}`;
+}
 async function findWorkItem(ticketId) {
   const seq  = parseInt(ticketId.replace(/[^0-9]/g, ''), 10);
   const data = await planeGet(
