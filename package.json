@@ -1,0 +1,24 @@
+{
+  "name": "e2e-testing",
+  "version": "1.0.0",
+  "description": "E2E testing platform for flight/ticket/card flows with ticket-scoped CI runs",
+  "scripts": {
+    "test": "playwright test",
+    "test:ticket": "node scripts/resolve-ticket-scope.js",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "test:flights": "playwright test --grep TICKET-10",
+    "test:tickets": "playwright test --grep TICKET-20",
+    "test:cards": "playwright test --grep TICKET-30",
+    "report:plane": "node scripts/plane-reporter.js",
+    "report:qa": "open qa-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@argos-ci/playwright": "^7.8.0",
+    "@playwright/test": "^1.64.1"
+  }
+}
