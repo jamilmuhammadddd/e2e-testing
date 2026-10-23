@@ -31,7 +31,8 @@ if (!fs.existsSync(RESULTS_FILE)) {
 // ── Parse results ─────────────────────────────────────────────────────────────
 const raw     = JSON.parse(fs.readFileSync(RESULTS_FILE, 'utf8'));
 const suites  = raw.suites || [];
-const TICKET_RE = /\[?(TICKET-\d+)\]?/i;
+// Matches both TICKET-123 and TMA-123 (and any PREFIX-123 style)
+const TICKET_RE = /\[?((?:[A-Z]+-)\d+)\]?/i;
 
 function flattenTests(suites, parentTicket = null) {
   const tests = [];
@@ -185,14 +186,22 @@ async function updateState(workItemId, passed) {
 }
 
 // ── Build HTML comment ────────────────────────────────────────────────────────
+// Playwright JSON statuses: 'expected' = passed, 'unexpected' = failed, 'skipped' = skipped
+function normalizeStatus(s) {
+  if (s === 'expected')   return 'passed';
+  if (s === 'unexpected') return 'failed';
+  return s; // 'skipped', 'flaky'
+}
+
 function statusIcon(s) {
-  return s === 'passed' ? '✅' : s === 'failed' ? '❌' : '⏭️';
+  const n = normalizeStatus(s);
+  return n === 'passed' ? '✅' : n === 'failed' ? '❌' : '⏭️';
 }
 
 function buildComment(ticket, tests, uploadedMedia) {
-  const passed  = tests.filter(t => t.status === 'passed').length;
-  const failed  = tests.filter(t => t.status === 'failed').length;
-  const skipped = tests.filter(t => t.status === 'skipped').length;
+  const passed  = tests.filter(t => normalizeStatus(t.status) === 'passed').length;
+  const failed  = tests.filter(t => normalizeStatus(t.status) === 'failed').length;
+  const skipped = tests.filter(t => normalizeStatus(t.status) === 'skipped').length;
   const total   = tests.length;
   const ms      = tests.reduce((a, t) => a + t.duration, 0);
   const overall = failed > 0 ? '❌ FAILED' : '✅ PASSED';
@@ -249,7 +258,7 @@ function buildComment(ticket, tests, uploadedMedia) {
 
   for (const ticket of tickets) {
     const tests  = byTicket[ticket];
-    const passed = tests.every(t => t.status !== 'failed');
+  const passed = tests.every(t => normalizeStatus(t.status) !== 'failed');
 
     console.log(`\n[${ticket}] Looking up work item...`);
     let item;
