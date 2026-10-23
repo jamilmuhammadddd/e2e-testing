@@ -224,11 +224,12 @@ function buildComment(ticket, tests, uploadedMedia) {
     let evidenceLinks = '';
     if (media.screenshots?.length) {
       media.screenshots.forEach((url, si) => {
-        evidenceLinks += `<a href="${url}">📸 Screenshot ${si + 1}</a> `;
+        // Embed as inline image preview + fallback link
+        evidenceLinks += `<a href="${url}" target="_blank"><img src="${url}" alt="Screenshot ${si + 1}" width="480" style="max-width:100%;border-radius:4px;margin:4px 0;display:block" /></a> `;
       });
     }
     if (media.video) {
-      evidenceLinks += `<a href="${media.video}">🎥 Video</a>`;
+      evidenceLinks += `<a href="${media.video}" target="_blank">🎥 Video recording</a>`;
     }
     if (!evidenceLinks) evidenceLinks = '—';
 
