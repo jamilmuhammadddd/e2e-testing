@@ -63,3 +63,20 @@ jobs:
           name: test-results
           path: test-results/
           retention-days: 7
+
+      - name: Post QA report to Plane
+        if: always()
+        run: node scripts/plane-reporter.js
+        env:
+          PLANE_TOKEN: ${{ secrets.PLANE_TOKEN }}
+          PLANE_WORKSPACE: ${{ secrets.PLANE_WORKSPACE }}
+          PLANE_PROJECT_ID: ${{ secrets.PLANE_PROJECT_ID }}
+          PLANE_BASE_URL: https://plane.techgadgetforus.com
+
+      - name: Upload QA HTML reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-report
+          path: qa-report/
+          retention-days: 14
