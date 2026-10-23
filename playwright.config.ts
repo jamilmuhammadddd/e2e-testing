@@ -26,6 +26,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     // Always capture so screenshots appear in QA reports
     screenshot: 'on',
+    // Record video for every test
+    video: 'on',
   },
   projects: [
     {
