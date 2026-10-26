@@ -28,6 +28,12 @@ export default defineConfig({
     screenshot: 'on',
     // Record video for every test
     video: 'on',
+    // HAR records every network request/response — used for API evidence
+    recordHar: {
+      path: 'test-results/network.har',
+      mode: 'full',
+      content: 'embed',
+    },
   },
   projects: [
     {
